@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindOptionsWhere, Not  } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import * as dotenv from 'dotenv';
 
 import { Admin } from '../../entities/admin.entity';
 

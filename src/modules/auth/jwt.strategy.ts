@@ -7,11 +7,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'SECRET_KEY',
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
+  //giai ma
   async validate(payload: any) {
-    return { id: payload.id, username: payload.username, role: payload.role };
+    console.log('>>>check token in payload: ', payload);
+    return {
+      id: payload.id,
+      username: payload.username,
+      role: payload.role,
+    };
   }
 }

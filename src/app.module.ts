@@ -5,7 +5,7 @@ import databaseConfig from './config/database.config';
 
 import { AdminAuthModule } from './modules/auth/admin-auth/admin-auth.module';
 import { AdminModule } from './modules/admin/admin.module';
-import { Admin } from './entities/admin.entity';
+import { CustomerModule } from './modules/customer/customer.module';
 
 @Module({
   imports: [
@@ -15,20 +15,21 @@ import { Admin } from './entities/admin.entity';
     }),
     TypeOrmModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
-        type: 'mysql', 
+        type: 'mysql',
         host: configService.get('database.host'),
         port: configService.get('database.port'),
         username: configService.get('database.username'),
         password: configService.get('database.password'),
         database: configService.get('database.database'),
-        entities: [Admin], 
+        entities: [__dirname + '/**/*.entity.{ts,js}'],
         synchronize: false,
         // logging: true, //check log querry to sql
       }),
       inject: [ConfigService],
     }),
-    AdminAuthModule, 
-    AdminModule
+    AdminAuthModule,
+    AdminModule,
+    CustomerModule,
   ],
 })
 export class AppModule {}
