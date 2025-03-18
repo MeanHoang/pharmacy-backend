@@ -36,4 +36,24 @@ export class CustomerService {
       limit,
     };
   }
+
+  //create
+  async create(customer: Customer): Promise<Customer> {
+    // Kiểm tra nếu email đã tồn tại
+    const existingCustomer = await this.customerRepositoty.findOne({
+      where: { email: customer.email },
+    });
+    if (existingCustomer) {
+      throw new Error('Email đã tồn tại');
+    }
+
+    // Mã hóa mật khẩu trước khi lưu
+    const hashedPassword = await bcrypt.hash(customer.password, 10);
+    customer.password = hashedPassword;
+
+    // Lưu customer vào cơ sở dữ liệu
+    const savedCustomer = await this.customerRepositoty.save(customer);
+
+    return savedCustomer;
+  }
 }
