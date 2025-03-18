@@ -38,13 +38,14 @@ export class CustomerService {
   }
 
   //create
-  async create(customer: Customer): Promise<Customer> {
+  async create(customer: Customer) {
     // Kiểm tra nếu email đã tồn tại
     const existingCustomer = await this.customerRepositoty.findOne({
-      where: { email: customer.email },
+      where: [{ email: customer.email }, { phonenumber: customer.phonenumber }],
     });
+
     if (existingCustomer) {
-      throw new Error('Email đã tồn tại');
+      return null;
     }
 
     // Mã hóa mật khẩu trước khi lưu
@@ -55,5 +56,53 @@ export class CustomerService {
     const savedCustomer = await this.customerRepositoty.save(customer);
 
     return savedCustomer;
+  }
+
+  //get customer byID
+  async getCustomerByID(id: number) {
+    const customer = await this.customerRepositoty.findOneBy({ id });
+
+    if (!customer) {
+      return null;
+    }
+
+    return customer;
+  }
+
+  //update
+  async update(id: number, customerData: Partial<Customer>) {
+    const customer = await this.customerRepositoty.findOneBy({ id });
+
+    if (!customer) {
+      return null;
+    }
+
+    if (customerData.password) {
+      const isSamePassword = await bcrypt.compare(
+        customerData.password,
+        customer.password,
+      );
+      if (!isSamePassword) {
+        customerData.password = await bcrypt.hash(customerData.password, 10);
+      } else {
+        delete customerData.password;
+      }
+    }
+
+    // Cập nhật từng trường nếu được gửi lên
+    Object.assign(customer, customerData);
+
+    return await this.customerRepositoty.save(customer);
+  }
+
+  //delete
+  async delete(id: number) {
+    const deleteResult = await this.customerRepositoty.delete(id);
+
+    if (deleteResult.affected === 0) {
+      return false;
+    }
+
+    return true;
   }
 }

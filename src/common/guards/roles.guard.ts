@@ -15,18 +15,22 @@ export class RolesGuard extends JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     // Lấy vai trò yêu cầu từ metadata
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    if (!roles) {
+    const requiredRoles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
+    if (!requiredRoles) {
       return true; // Nếu không có vai trò yêu cầu thì cho phép truy cập
     }
 
-    const { role } = context.switchToHttp().getRequest().user;
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
 
-    console.log('>>>check role: ', role);
+    console.log('>>>check role: ', requiredRoles);
 
     // Kiểm tra xem vai trò của người dùng có khớp với vai trò yêu cầu không
-    if (!roles.includes(role)) {
-      throw new ForbiddenException('Bạn không có quyền truy cập');
+    if (!user || !requiredRoles.includes(user.role)) {
+      throw new ForbiddenException('Bạn không có quyền truy cập!');
     }
 
     return true;

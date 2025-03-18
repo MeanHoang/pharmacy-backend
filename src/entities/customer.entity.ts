@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 import { Gender } from './gender.entity';
+import { CustomerAddress } from './customer-address.entity';
 
 @Entity('customers')
 export class Customer {
@@ -49,4 +50,10 @@ export class Customer {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
+
+  //address
+  @OneToMany(() => CustomerAddress, (address) => address.customer, {
+    cascade: true,
+  })
+  addresses: CustomerAddress[];
 }

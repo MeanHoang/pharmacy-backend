@@ -24,11 +24,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
 
     //kiểm tra vai trò
-    if (user.role !== 'admin') {
-      throw new UnauthorizedException(
-        new ResponseDto('error', 'Không có quyền truy cập!', null),
-      );
-    }
+    // if (user.role !== 'admin') {
+    //   throw new UnauthorizedException(
+    //     new ResponseDto('error', 'Không có quyền truy cập!', null),
+    //   );
+    // }
 
     // Trả về người dùng nếu không có lỗi
     return user;

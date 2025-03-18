@@ -15,9 +15,12 @@ import { Admin } from '../../entities/admin.entity';
 import { ResponseDto } from '../../dtos/response.dto';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('admin')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 

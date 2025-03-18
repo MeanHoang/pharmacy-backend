@@ -7,6 +7,8 @@ import { AdminAuthModule } from './modules/auth/admin-auth/admin-auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { CustomerAuthModule } from './modules/auth/customer-auth/customer-auth.module';
+import { CustomerAddressModule } from './modules/customer-address/customer-address.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +33,7 @@ import { CustomerAuthModule } from './modules/auth/customer-auth/customer-auth.m
     AdminModule,
     CustomerModule,
     CustomerAuthModule,
+    CustomerAddressModule,
   ],
 })
 export class AppModule {}

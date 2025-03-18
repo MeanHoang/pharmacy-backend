@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, FindOptionsWhere, Not  } from 'typeorm';
+import { Repository, Like, FindOptionsWhere, Not } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { Admin } from '../../entities/admin.entity';
@@ -14,9 +14,7 @@ export class AdminService {
 
   //find all
   async findAll(page: number, limit: number, search?: string) {
-    const whereCondition = search
-      ? { username: Like(`%${search}%`) } 
-      : {}; 
+    const whereCondition = search ? { username: Like(`%${search}%`) } : {};
 
     const [data, total] = await this.adminRepository.findAndCount({
       where: whereCondition,
@@ -33,12 +31,14 @@ export class AdminService {
     };
   }
 
-  //create 
-  async create(admin: Admin){
-    //check username 
-    const checkAdmin = await this.adminRepository.findOneBy({ username: admin.username});
+  //create
+  async create(admin: Admin) {
+    //check username
+    const checkAdmin = await this.adminRepository.findOneBy({
+      username: admin.username,
+    });
 
-    if(checkAdmin){
+    if (checkAdmin) {
       return null;
     }
 
@@ -48,21 +48,21 @@ export class AdminService {
       ...admin,
       password: hashedPassword,
     });
-    
+
     await this.adminRepository.save(finalAdmin);
 
-      return {
-        id: finalAdmin.id,
-        username: finalAdmin.username,
-        fullname: finalAdmin.fullname,
-        is_active: finalAdmin.is_active,
-        created_at: finalAdmin.created_at,
-        updated_at: finalAdmin.updated_at,
-  };
+    return {
+      id: finalAdmin.id,
+      username: finalAdmin.username,
+      fullname: finalAdmin.fullname,
+      is_active: finalAdmin.is_active,
+      created_at: finalAdmin.created_at,
+      updated_at: finalAdmin.updated_at,
+    };
   }
 
   //update
-  async update(id: number, adminData: Partial<Admin>){
+  async update(id: number, adminData: Partial<Admin>) {
     const admin = await this.adminRepository.findOneBy({ id });
 
     if (!admin) {
@@ -76,16 +76,19 @@ export class AdminService {
       });
 
       if (existingAdmin) {
-        return 'duplicate'; 
+        return 'duplicate';
       }
     }
 
     if (adminData.password) {
-      const isSamePassword = await bcrypt.compare(adminData.password, admin.password);
+      const isSamePassword = await bcrypt.compare(
+        adminData.password,
+        admin.password,
+      );
       if (!isSamePassword) {
         adminData.password = await bcrypt.hash(adminData.password, 10);
       } else {
-        delete adminData.password; 
+        delete adminData.password;
       }
     }
 
@@ -95,27 +98,29 @@ export class AdminService {
     return await this.adminRepository.save(admin);
   }
 
-  //delete 
+  //delete
   async delete(id: number) {
     const deleteResult = await this.adminRepository.delete(id);
-    
+
     if (deleteResult.affected === 0) {
       return false;
     }
-  
+
     return true;
   }
-  
+
+  //1 detail
   async getAdminByID(id: number) {
     const admin = await this.adminRepository.findOneBy({ id });
-    
+
     if (!admin) {
       return null;
     }
-  
+
     return admin;
   }
 
+  //reset pasword
   async resetPassword(id: number): Promise<Admin | null> {
     const admin = await this.adminRepository.findOneBy({ id });
 
@@ -131,5 +136,4 @@ export class AdminService {
 
     return admin;
   }
-
 }
