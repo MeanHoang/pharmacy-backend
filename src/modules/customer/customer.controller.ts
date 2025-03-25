@@ -10,7 +10,11 @@ import {
   Patch,
   UseGuards,
   Search,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CustomerService } from './customer.service';
 import { Customer } from 'src/entities/customer.entity';
@@ -44,10 +48,14 @@ export class CustomerController {
   }
 
   @Post('/create')
-  async create(@Body() customer: Customer) {
-    // console.log('>>>check body: ', customer);
+  @UseInterceptors(FileInterceptor('avatar'))
+  async create(
+    @Body() customer: any,
+    @UploadedFile() avatar?: Express.Multer.File,
+  ) {
+    console.log('>>>check file avatar: ', avatar);
     try {
-      const newCustomer = await this.customerService.create(customer);
+      const newCustomer = await this.customerService.create(customer, avatar);
 
       if (!newCustomer) {
         return new ResponseDto('error', 'Email và SDT đã được sử dụng!', null);
@@ -63,8 +71,8 @@ export class CustomerController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'customer')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('admin', 'customer')
   @Put(':id')
   async update(
     @Body() customerData: Partial<Customer>,

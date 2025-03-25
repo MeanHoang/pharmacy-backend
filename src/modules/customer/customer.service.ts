@@ -5,11 +5,14 @@ import * as bcrypt from 'bcrypt';
 
 import { Customer } from 'src/entities/customer.entity';
 
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+
 @Injectable()
 export class CustomerService {
   constructor(
     @InjectRepository(Customer)
     private readonly customerRepositoty: Repository<Customer>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   //find all
@@ -38,24 +41,49 @@ export class CustomerService {
   }
 
   //create
-  async create(customer: Customer) {
-    // Kiểm tra nếu email đã tồn tại
-    const existingCustomer = await this.customerRepositoty.findOne({
-      where: [{ email: customer.email }, { phonenumber: customer.phonenumber }],
-    });
+  async create(customer: Customer, avatar?: Express.Multer.File) {
+    try {
+      //Chuyển customer từ object có null prototype thành object thường
+      customer = JSON.parse(JSON.stringify(customer));
+      // console.log('>>>check customer in service: ', customer);
 
-    if (existingCustomer) {
-      return null;
+      // Kiểm tra nếu email đã tồn tại
+      const existingCustomer = await this.customerRepositoty.findOne({
+        where: [
+          { email: customer.email },
+          { phonenumber: customer.phonenumber },
+        ],
+      });
+
+      if (existingCustomer) return null;
+
+      // Mã hóa mật khẩu trước khi lưu
+      const hashedPassword = await bcrypt.hash(customer.password, 10);
+      customer.password = hashedPassword;
+      let avatarUrl = process.env.URL_AVATAR_DEFAULT;
+
+      if (avatar) {
+        try {
+          const uploadResult = await this.cloudinaryService.uploadImage(avatar);
+          avatarUrl = uploadResult.secure_url;
+        } catch (error) {
+          console.error('Lỗi upload ảnh:', error);
+        }
+      }
+
+      const newCustomer = this.customerRepositoty.create({
+        ...customer,
+        password: hashedPassword,
+        avatar: avatarUrl,
+      });
+
+      // Lưu customer vào cơ sở dữ liệu
+      const savedCustomer = await this.customerRepositoty.save(newCustomer);
+
+      return savedCustomer;
+    } catch (error) {
+      console.log('>>check err: ', error);
     }
-
-    // Mã hóa mật khẩu trước khi lưu
-    const hashedPassword = await bcrypt.hash(customer.password, 10);
-    customer.password = hashedPassword;
-
-    // Lưu customer vào cơ sở dữ liệu
-    const savedCustomer = await this.customerRepositoty.save(customer);
-
-    return savedCustomer;
   }
 
   //get customer byID
