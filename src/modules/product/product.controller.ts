@@ -12,6 +12,7 @@ import {
   Search,
   UploadedFile,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -43,24 +44,40 @@ export class ProductController {
       isSales,
     );
 
+    if (!result)
+      return new ResponseDto(
+        'failed',
+        'Tải danh sách sản phẩm thất bại!',
+        result,
+      );
+    // console.log('check result: ', result);
+
     return new ResponseDto(
       'success',
-      'Tải danh sách danh mục thành công!',
+      'Tải danh sách sản phẩm thành công!',
       result,
     );
   }
 
   @Post('/create')
   async create(@Body() productData: any) {
+    console.log('>>> Parsed productData:', productData);
     try {
       const newProduct = await this.productService.create(productData);
 
-      return new ResponseDto('success', 'Tạo danh mục thành công', newProduct);
+      if (!newProduct)
+        return new ResponseDto(
+          'error',
+          'Lỗi tạo sản phẩm! Kiểm tra lại thông tin',
+          null,
+        );
+
+      return new ResponseDto('success', 'Tạo sản phẩm thành công', newProduct);
     } catch (error) {
       console.log('>>> Err create product: ', error);
       return new ResponseDto(
         'error',
-        'Lỗi tạo danh mục! Kiểm tra lại thông tin',
+        'Lỗi tạo sản phẩm! Kiểm tra lại thông tin',
         null,
       );
     }
@@ -74,16 +91,16 @@ export class ProductController {
       const updatedProduct = await this.productService.update(id, productData);
 
       if (updatedProduct === null) {
-        return new ResponseDto('error', 'Không tìm thấy danh mục!', null);
+        return new ResponseDto('error', 'Không tìm thấy sản phẩm!', null);
       }
 
       return new ResponseDto(
         'success',
-        'Cập nhật thông tin danh mục thành công!',
+        'Cập nhật thông tin sản phẩm thành công!',
         updatedProduct,
       );
     } catch (error) {
-      return new ResponseDto('error', 'Lỗi cập nhật danh mục!', null);
+      return new ResponseDto('error', 'Lỗi cập nhật sản phẩm!', null);
     }
   }
 
@@ -95,11 +112,11 @@ export class ProductController {
       const isDeleted = await this.productService.delete(id);
       console.log('>>> check isDeleted: ', isDeleted);
       if (!isDeleted)
-        return new ResponseDto('error', 'Không tìm thấy danh mục', null);
+        return new ResponseDto('error', 'Không tìm thấy sản phẩm', null);
 
-      return new ResponseDto('success', 'Xóa danh mục thành công', id);
+      return new ResponseDto('success', 'Xóa sản phẩm thành công', id);
     } catch (error) {
-      return new ResponseDto('error', 'Xóa danh mục thất bại', null);
+      return new ResponseDto('error', 'Xóa sản phẩm thất bại', null);
     }
   }
 
@@ -108,15 +125,15 @@ export class ProductController {
     try {
       const product = await this.productService.getProductByID(id);
       if (product === null)
-        return new ResponseDto('error', 'Không tìm thấy danh mục', null);
+        return new ResponseDto('error', 'Không tìm thấy sản phẩm', null);
 
       return new ResponseDto(
         'success',
-        'Lấy thông danh mục thành công',
+        'Lấy thông sản phẩm thành công',
         product,
       );
     } catch (error) {
-      return new ResponseDto('error', 'Không tìm thấy danh mục', null);
+      return new ResponseDto('error', 'Không tìm thấy sản phẩm', null);
     }
   }
 }

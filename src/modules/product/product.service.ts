@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindOptionsWhere, Not } from 'typeorm';
 
 import { Product } from 'src/entities/product.entity';
+import { Category } from 'src/entities/category.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
   ) {}
 
   //find all
@@ -18,28 +21,32 @@ export class ProductService {
     search?: string,
     isSales?: boolean,
   ) {
-    const whereCondition: FindOptionsWhere<Product>[] = [];
+    try {
+      const queryBuilder = this.productRepository.createQueryBuilder('product');
 
-    if (search) {
-      whereCondition.push(
-        { name: Like(`%${search}%`) },
-        { description: Like(`%${search}%`) },
-        { brand: Like(`%${search}%`) },
-        { origin: Like(`%${search}%`) },
-        { ingredients: Like(`%${search}%`) }, //Thành phần thuốc
-        { note: Like(`%${search}%`) },
-      );
-
-      if (isSales !== undefined) {
-        whereCondition.push({ is_sales: isSales });
+      // Tìm kiếm với điều kiện OR
+      if (search) {
+        queryBuilder.where(
+          `(product.name LIKE :search OR product.description LIKE :search OR 
+            product.brand LIKE :search OR product.origin LIKE :search OR 
+            product.ingredients LIKE :search OR product.note LIKE :search)`,
+          { search: `%${search}%` },
+        );
       }
 
-      const [data, total] = await this.productRepository.findAndCount({
-        where: whereCondition.length > 0 ? whereCondition : undefined,
-        skip: (page - 1) * limit,
-        take: limit,
-        order: { updated_at: 'DESC' }, // Sắp xếp theo ngày cập nhật mới nhất
-      });
+      // AND với isSales
+      if (isSales !== undefined) {
+        queryBuilder.andWhere('product.is_sales = :isSales', { isSales });
+      }
+
+      queryBuilder
+        .skip((page - 1) * limit)
+        .take(limit)
+        .orderBy('product.updated_at', 'DESC');
+
+      const [data, total] = await queryBuilder.getManyAndCount();
+
+      console.log('>>> check result:', data); // Debug kết quả
 
       return {
         data,
@@ -48,20 +55,32 @@ export class ProductService {
         currentPage: page,
         limit,
       };
+    } catch (error) {
+      console.error('>> Error in findAll:', error);
+      throw new Error(error.message);
     }
   }
 
   //create
-  async create(productData: Partial<Product>) {
+  async create(productData: Partial<Product> & { category_id: number }) {
+    // console.log('>>> Check productData: ', productData);
+
     try {
-      //Chuyển product từ object có null prototype thành object thường
-      productData = JSON.parse(JSON.stringify(productData));
-      // console.log('>>>check product in service: ', product);
+      const category = await this.categoryRepository.findOne({
+        where: { id: productData.category_id },
+      });
+
+      if (!category) {
+        return null;
+      }
+
+      const newProduct = this.productRepository.create({
+        ...productData,
+        category, // Gán entity Category, không phải ID
+      });
 
       // Lưu product vào cơ sở dữ liệu
-      const savedProduct = await this.productRepository.save(productData);
-
-      return savedProduct;
+      return await this.productRepository.save(newProduct);
     } catch (error) {
       console.log('>>check err: ', error);
     }

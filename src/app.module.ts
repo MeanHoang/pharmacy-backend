@@ -11,6 +11,8 @@ import { CustomerAddressModule } from './modules/customer-address/customer-addre
 import { StoreModule } from './modules/store/store.module';
 import { StoreAuthModule } from './modules/auth/store-auth/store-auth.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
+import { ProductImageModule } from './modules/product-image/product-image.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { CategoryModule } from './modules/category/category.module';
     StoreAuthModule,
     StoreModule,
     CategoryModule,
+    ProductModule,
+    ProductImageModule,
   ],
 })
 export class AppModule {}

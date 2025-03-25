@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Category } from './category.entity';
-import { ProductImage } from './product-images.entity';
+import { ProductImage } from './product-image.entity';
 
 @Entity('products')
 export class Product {
