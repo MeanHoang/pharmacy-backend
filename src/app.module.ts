@@ -8,6 +8,8 @@ import { AdminModule } from './modules/admin/admin.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { CustomerAuthModule } from './modules/auth/customer-auth/customer-auth.module';
 import { CustomerAddressModule } from './modules/customer-address/customer-address.module';
+import { StoreModule } from './modules/store/store.module';
+import { StoreAuthModule } from './modules/auth/store-auth/store-auth.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { CustomerAddressModule } from './modules/customer-address/customer-addre
     CustomerModule,
     CustomerAuthModule,
     CustomerAddressModule,
+    StoreAuthModule,
+    StoreModule,
   ],
 })
 export class AppModule {}

@@ -9,28 +9,21 @@ import {
 
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
-import { CustomerAuthService } from './customer-auth.service';
-import { LoginCustomerDto } from 'src/dtos/login-customer.dto';
+import { StoreAuthService } from './store-auth.service';
+import { LoginStoreDto } from 'src/dtos/login-store.dto';
 import { ResponseDto } from '../../../dtos/response.dto';
 
-@Controller('customer/auth')
-export class CustomerAuthController {
-  constructor(private readonly customerAuthService: CustomerAuthService) {}
+@Controller('store/auth')
+export class StoreAuthController {
+  constructor(private readonly adminAuthService: StoreAuthService) {}
 
   @Post('login')
-  async login(@Body() body: LoginCustomerDto): Promise<ResponseDto<any>> {
+  async login(@Body() body: LoginStoreDto): Promise<ResponseDto<any>> {
     try {
       console.log('>>>check body: ', body);
-      if (!body.email || !body.password) {
-        return new ResponseDto(
-          'error',
-          'Email và mật khẩu không được để trống',
-          null,
-        );
-      }
 
-      const result = await this.customerAuthService.login(
-        body.email,
+      const result = await this.adminAuthService.login(
+        body.username,
         body.password,
       );
 

@@ -10,75 +10,75 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { Admin } from '../../entities/admin.entity';
+import { StoreService } from './store.service';
+import { Store } from '../../entities/store.entity';
 import { ResponseDto } from '../../dtos/response.dto';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 
-@Controller('admin')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin')
-export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+@Controller('store')
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @Roles('store', 'admin')
+export class StoreController {
+  constructor(private readonly storeService: StoreService) {}
 
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin')
+  // @Roles('store')
   @Get()
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 5,
     @Query('search') search?: string,
   ): Promise<ResponseDto<any>> {
-    console.log('>>> Call API GET list admin!');
+    console.log('>>> Call API GET list store!');
 
-    const result = await this.adminService.findAll(page, limit, search);
+    const result = await this.storeService.findAll(page, limit, search);
 
     return new ResponseDto(
       'success',
-      'Tải danh sách người dùng thành công!',
+      'Tải danh sách cửa hàng thành công!',
       result,
     );
   }
 
   @Post('/create')
-  async create(@Body() admin: Admin) {
+  async create(@Body() store: Store) {
     try {
-      const newAdmin = await this.adminService.create(admin);
+      const newStore = await this.storeService.create(store);
 
-      if (!newAdmin) {
+      if (!newStore) {
         return new ResponseDto('error', 'Tên tài khoản đã được sử dụng!', null);
       }
 
-      return new ResponseDto('success', 'Tạo tài khoản thành công', newAdmin);
+      return new ResponseDto('success', 'Tạo tài khoản thành công', newStore);
     } catch (error) {
       return new ResponseDto('error', 'Lỗi tạo tài khoản!', null);
     }
   }
 
   @Put(':id')
-  async update(@Body() adminData: Partial<Admin>, @Param('id') id: number) {
+  async update(@Body() storeData: Partial<Store>, @Param('id') id: number) {
     try {
-      const updatedAdmin = await this.adminService.update(id, adminData);
+      const updatedStore = await this.storeService.update(id, storeData);
 
-      if (updatedAdmin === null) {
+      if (updatedStore === null) {
         return new ResponseDto(
           'error',
-          'Không tìm thấy admin cần cập nhật!',
+          'Không tìm thấy store cần cập nhật!',
           null,
         );
       }
 
-      if (updatedAdmin === 'duplicate') {
+      if (updatedStore === 'duplicate') {
         return new ResponseDto('error', 'Tên đăng nhập đã tồn tại!', null);
       }
 
       return new ResponseDto(
         'success',
-        'Cập nhật admin thành công!',
-        updatedAdmin,
+        'Cập nhật store thành công!',
+        updatedStore,
       );
     } catch (error) {
       return new ResponseDto('error', 'Lỗi cập nhật tài khoản!', null);
@@ -88,7 +88,7 @@ export class AdminController {
   @Delete(':id')
   async delete(@Param('id') id: number) {
     try {
-      const isDeleted = await this.adminService.delete(id);
+      const isDeleted = await this.storeService.delete(id);
       console.log('>>> check isDeleted: ', isDeleted);
       if (!isDeleted)
         return new ResponseDto('error', 'Không tìm thấy tài khoản', null);
@@ -100,16 +100,16 @@ export class AdminController {
   }
 
   @Get(':id')
-  async getAdminByID(@Param('id') id: number) {
+  async getStoreByID(@Param('id') id: number) {
     try {
-      const admin = await this.adminService.getAdminByID(id);
-      if (admin === null)
+      const store = await this.storeService.getStoreByID(id);
+      if (store === null)
         return new ResponseDto('error', 'Không tìm thấy tài khoản', null);
 
       return new ResponseDto(
         'success',
         'Lấy thông tài khoản thành công',
-        admin,
+        store,
       );
     } catch (error) {
       return new ResponseDto('error', 'Không tìm thấy tài khoản', null);
@@ -118,12 +118,12 @@ export class AdminController {
 
   @Patch('/reset-password/:id')
   async resetPassword(@Param('id') id: number): Promise<ResponseDto<any>> {
-    const admin = await this.adminService.resetPassword(id);
+    const store = await this.storeService.resetPassword(id);
 
-    if (admin === null) {
-      return new ResponseDto('error', 'Admin không tồn tại!', null);
+    if (store === null) {
+      return new ResponseDto('error', 'Store không tồn tại!', null);
     }
 
-    return new ResponseDto('success', 'Reset mật khẩu thành công!', admin);
+    return new ResponseDto('success', 'Reset mật khẩu thành công!', store);
   }
 }
