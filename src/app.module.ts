@@ -10,6 +10,7 @@ import { CustomerAuthModule } from './modules/auth/customer-auth/customer-auth.m
 import { CustomerAddressModule } from './modules/customer-address/customer-address.module';
 import { StoreModule } from './modules/store/store.module';
 import { StoreAuthModule } from './modules/auth/store-auth/store-auth.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { StoreAuthModule } from './modules/auth/store-auth/store-auth.module';
     CustomerAddressModule,
     StoreAuthModule,
     StoreModule,
+    CategoryModule,
   ],
 })
 export class AppModule {}

@@ -115,7 +115,7 @@ export class CustomerController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'customer')
+  @Roles('admin', 'customer', 'store')
   @Get(':id')
   async getCustomerByID(@Param('id') id: number) {
     try {
