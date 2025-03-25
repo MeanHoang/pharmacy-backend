@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Category } from './category.entity';
 import { ProductImage } from './product-image.entity';
+import { CartItem } from './cart-item.entity';
 
 @Entity('products')
 export class Product {
@@ -24,6 +25,9 @@ export class Product {
 
   @Column({ type: 'int', nullable: false })
   price: number;
+
+  @Column({ type: 'int', nullable: false, default: () => 'CURRENT_TIMESTAMP' })
+  stock: number;
 
   @Column({ type: 'int', nullable: false, default: () => 'CURRENT_TIMESTAMP' })
   discount: number;
@@ -75,4 +79,8 @@ export class Product {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
+
+  //cart-items
+  @OneToMany(() => CartItem, (cartItem) => cartItem.product)
+  cartItems: CartItem[];
 }

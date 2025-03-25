@@ -20,7 +20,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 
 import { ResponseDto } from '../../dtos/response.dto';
 
-@Controller('customer-addresses')
+@Controller('customer-address')
 // @UseGuards(JwtAuthGuard, RolesGuard)
 // @Roles('admin', 'customer')
 export class CustomerAddressController {

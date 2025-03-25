@@ -4,8 +4,6 @@ import { Repository, Like, FindOptionsWhere, Not } from 'typeorm';
 
 import { Category } from 'src/entities/category.entity';
 
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-
 @Injectable()
 export class CategoryService {
   constructor(
@@ -20,20 +18,18 @@ export class CategoryService {
     search?: string,
     isSales?: boolean,
   ) {
-    const whereCondition: FindOptionsWhere<Category>[] = [];
-
-    // console.log('>>> Client Query:', { search, isSales });
+    const whereCondition: FindOptionsWhere<Category> = {};
 
     if (search) {
-      whereCondition.push({ name: Like(`%${search}%`) });
+      whereCondition.name = Like(`%${search}%`);
     }
 
     if (isSales !== undefined) {
-      whereCondition.push({ is_sales: isSales });
+      whereCondition.is_sales = isSales;
     }
 
     const [data, total] = await this.categoryRepository.findAndCount({
-      where: whereCondition.length > 0 ? whereCondition : undefined,
+      where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
       order: { updated_at: 'DESC' }, // Sắp xếp theo ngày cập nhật mới nhất

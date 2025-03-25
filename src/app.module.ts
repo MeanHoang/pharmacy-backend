@@ -13,6 +13,8 @@ import { StoreAuthModule } from './modules/auth/store-auth/store-auth.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
 import { ProductImageModule } from './modules/product-image/product-image.module';
+import { CartModule } from './modules/cart/cart.module';
+import { CartItemModule } from './modules/cart-item/cart-item.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { ProductImageModule } from './modules/product-image/product-image.module
     CategoryModule,
     ProductModule,
     ProductImageModule,
+    CartModule,
+    CartItemModule,
   ],
 })
 export class AppModule {}

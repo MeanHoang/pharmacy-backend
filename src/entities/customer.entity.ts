@@ -1,7 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  Column,
+  OneToMany,
+} from 'typeorm';
 
 import { Gender } from './gender.entity';
 import { CustomerAddress } from './customer-address.entity';
+import { Cart } from './cart.entity';
 
 @Entity('customers')
 export class Customer {
@@ -56,4 +63,8 @@ export class Customer {
     cascade: true,
   })
   addresses: CustomerAddress[];
+
+  //cart
+  @OneToOne(() => Cart, (cart) => cart.customer)
+  cart: Cart;
 }
