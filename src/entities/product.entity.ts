@@ -5,8 +5,11 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { ProductImage } from './product-images.entity';
 
 @Entity('products')
 export class Product {
@@ -52,6 +55,17 @@ export class Product {
   @Column({ default: true })
   is_sales: boolean;
 
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+    cascade: true,
+  })
+  productImages: ProductImage[];
+
+  @ManyToOne(() => Category, (category) => category.products, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
@@ -61,9 +75,4 @@ export class Product {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
-
-  @ManyToOne(() => Category, (category) => category.products, {
-    onDelete: 'CASCADE',
-  })
-  category: Category;
 }
