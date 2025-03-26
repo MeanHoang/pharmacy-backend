@@ -34,4 +34,9 @@ export class CartItem {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  //Tính total price
+  getSubTotal(): number {
+    return this.quantity * this.price;
+  }
 }

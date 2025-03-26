@@ -28,7 +28,7 @@ export class CartItemService {
 
       const [data, total] = await this.cartItemRepository.findAndCount({
         where: whereCondition,
-        relations: ['product'],
+        relations: ['product', 'cart'],
         skip: (page - 1) * limit,
         take: limit,
         order: { updated_at: 'DESC' },

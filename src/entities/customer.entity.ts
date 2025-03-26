@@ -9,6 +9,7 @@ import {
 import { Gender } from './gender.entity';
 import { CustomerAddress } from './customer-address.entity';
 import { Cart } from './cart.entity';
+import { Order } from './order.entity';
 
 @Entity('customers')
 export class Customer {
@@ -58,13 +59,17 @@ export class Customer {
   })
   updated_at: Date;
 
-  //address
+  // OneToMany table address
   @OneToMany(() => CustomerAddress, (address) => address.customer, {
     cascade: true,
   })
   addresses: CustomerAddress[];
 
-  //cart
+  //OneToMany table cart
   @OneToOne(() => Cart, (cart) => cart.customer)
   cart: Cart;
+
+  //OneToMany table Order
+  @OneToMany(() => Order, (order) => order.customer)
+  orders: Order[];
 }

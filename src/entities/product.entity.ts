@@ -11,6 +11,7 @@ import {
 import { Category } from './category.entity';
 import { ProductImage } from './product-image.entity';
 import { CartItem } from './cart-item.entity';
+import { OrderItem } from './order-item.entity';
 
 @Entity('products')
 export class Product {
@@ -83,4 +84,7 @@ export class Product {
   //cart-items
   @OneToMany(() => CartItem, (cartItem) => cartItem.product)
   cartItems: CartItem[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 }
