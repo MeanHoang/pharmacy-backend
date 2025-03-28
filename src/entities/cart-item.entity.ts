@@ -15,10 +15,12 @@ export class CartItem {
   @PrimaryGeneratedColumn()
   id: number;
 
+  //Many to One table Cart
   @ManyToOne(() => Cart, (cart) => cart.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
 
+  //Many to One table Product
   @ManyToOne(() => Product, (product) => product.cartItems, { nullable: false })
   @JoinColumn({ name: 'product_id' })
   product: Product;

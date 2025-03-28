@@ -22,9 +22,6 @@ export class Category {
   @Column({ type: 'boolean', default: true })
   is_sales: boolean;
 
-  @OneToMany(() => Product, (product) => product.category, { cascade: true })
-  products: Product[];
-
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
@@ -34,4 +31,8 @@ export class Category {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
+
+  //category one to many table product
+  @OneToMany(() => Product, (product) => product.category, { cascade: true })
+  products: Product[];
 }

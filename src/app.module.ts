@@ -16,6 +16,8 @@ import { ProductImageModule } from './modules/product-image/product-image.module
 import { CartModule } from './modules/cart/cart.module';
 import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { OrderModule } from './modules/order/order.module';
+import { OrderItemModule } from './modules/order-item/order-item.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { OrderModule } from './modules/order/order.module';
     CartModule,
     CartItemModule,
     OrderModule,
+    OrderItemModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
@@ -17,7 +18,7 @@ export class Transaction {
   @Column({ type: 'varchar', length: 255, unique: true })
   transaction_id: string;
 
-  @Column({ type: 'enum', enum: ['momo', 'vnpay', 'paypal'] })
+  @Column({ type: 'enum', enum: ['zalopay', 'vnpay', 'paypal'] })
   payment_method: string;
 
   @Column({ type: 'int', nullable: false })
@@ -44,5 +45,6 @@ export class Transaction {
   @ManyToOne(() => Order, (order) => order.transactions, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'order_id' })
   order: Order;
 }
