@@ -36,7 +36,7 @@ export class CustomerController {
     @Query('limit') limit: number = 5,
     @Query('search') search?: string,
   ): Promise<ResponseDto<any>> {
-    console.log('>>> Call api get customer list');
+    // console.log('>>> Call api get customer list');
 
     const result = await this.customerService.findAll(page, limit, search);
 
@@ -71,8 +71,8 @@ export class CustomerController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin', 'customer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'customer')
   @Put(':id')
   async update(
     @Body() customerData: Partial<Customer>,
@@ -99,7 +99,7 @@ export class CustomerController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'customer')
   @Delete(':id')
   async delete(@Param('id') id: number) {
     try {
@@ -130,6 +130,42 @@ export class CustomerController {
       );
     } catch (error) {
       return new ResponseDto('error', 'Không tìm thấy tài khoản', null);
+    }
+  }
+
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles('customer')
+  @Patch(':id/reset-password')
+  async resetPassword(@Param('id') id: number) {
+    try {
+      const result = await this.customerService.resetPassword(id);
+
+      if (!result) {
+        return new ResponseDto('error', 'Không tìm thấy tài khoản', null);
+      }
+
+      return new ResponseDto('success', 'Đặt lại mật khẩu thành công', null);
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi đặt lại mật khẩu!', null);
+    }
+  }
+
+  @Patch('/status/:id')
+  async updateStatus(@Param('id') id: number): Promise<ResponseDto<any>> {
+    try {
+      const updatedCustomer = await this.customerService.updateStatus(id);
+
+      if (!updatedCustomer) {
+        return new ResponseDto('error', 'Không tìm thấy khách hàng!', null);
+      }
+
+      return new ResponseDto(
+        'success',
+        'Cập nhật trạng thái khách hàng thành công!',
+        updatedCustomer,
+      );
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi cập nhật trạng thái!', null);
     }
   }
 }

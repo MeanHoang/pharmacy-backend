@@ -33,9 +33,9 @@ export class CategoryController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 5,
     @Query('search') search?: string,
-    @Query('isSales') isSales?: boolean, // truyền 0,1 thì lại ok
+    @Query('isSales') isSales?: boolean,
   ): Promise<ResponseDto<any>> {
-    console.log('>>> Call api get category list');
+    // console.log('>>> Call api get category list');
     const result = await this.categoryService.findAll(
       page,
       limit,
@@ -50,6 +50,8 @@ export class CategoryController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Post('/create')
   async create(@Body() categoryData: any) {
     try {
@@ -66,8 +68,8 @@ export class CategoryController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin', 'category')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Put(':id')
   async update(
     @Body() categoryData: Partial<Category>,
@@ -123,6 +125,25 @@ export class CategoryController {
       );
     } catch (error) {
       return new ResponseDto('error', 'Không tìm thấy danh mục', null);
+    }
+  }
+
+  @Patch('/status/:id')
+  async updateStatus(@Param('id') id: number): Promise<ResponseDto<any>> {
+    try {
+      const updatedCategory = await this.categoryService.updateStatus(id);
+
+      if (!updatedCategory) {
+        return new ResponseDto('error', 'Không tìm thấy danh mục!', null);
+      }
+
+      return new ResponseDto(
+        'success',
+        'Cập nhật danh mục thành công!',
+        updatedCategory,
+      );
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi cập nhật trạng thái!', null);
     }
   }
 }

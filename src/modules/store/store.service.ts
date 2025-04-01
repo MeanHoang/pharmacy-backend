@@ -121,12 +121,21 @@ export class StoreService {
       return null;
     }
 
-    const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD || '123';
+    const defaultPassword = process.env.DEFAULT_STORE_PASSWORD || '1';
 
     const newPassword = await bcrypt.hash(defaultPassword, 10);
     store.password = newPassword;
     await this.storeRepository.save(store);
 
     return store;
+  }
+
+  async updateStatus(id: number): Promise<Store | null> {
+    const store = await this.storeRepository.findOne({ where: { id } });
+
+    if (!store) return null;
+
+    store.is_active = !store.is_active; // Đảo ngược trạng thái
+    return await this.storeRepository.save(store);
   }
 }

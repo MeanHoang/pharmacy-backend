@@ -59,11 +59,17 @@ export class ProductController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Post('/create')
-  async create(@Body() productData: any) {
-    console.log('>>> Parsed productData:', productData);
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() productData: any,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    // console.log('>>> Check productData controller:', productData);
     try {
-      const newProduct = await this.productService.create(productData);
+      const newProduct = await this.productService.create(productData, image);
 
       if (!newProduct)
         return new ResponseDto(
@@ -83,8 +89,8 @@ export class ProductController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles('admin', 'product')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Put(':id')
   async update(@Body() productData: Partial<Product>, @Param('id') id: number) {
     try {
@@ -134,6 +140,25 @@ export class ProductController {
       );
     } catch (error) {
       return new ResponseDto('error', 'Không tìm thấy sản phẩm', null);
+    }
+  }
+
+  @Patch('/status/:id')
+  async updateStatus(@Param('id') id: number): Promise<ResponseDto<any>> {
+    try {
+      const updatedProduct = await this.productService.updateStatus(id);
+
+      if (!updatedProduct) {
+        return new ResponseDto('error', 'Không tìm thấy sản phẩm!', null);
+      }
+
+      return new ResponseDto(
+        'success',
+        'Cập nhật trạng thái sản phẩm thành công!',
+        updatedProduct,
+      );
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi cập nhật trạng thái!', null);
     }
   }
 }

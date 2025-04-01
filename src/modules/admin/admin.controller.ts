@@ -24,15 +24,13 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
   @Get()
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 5,
     @Query('search') search?: string,
   ): Promise<ResponseDto<any>> {
-    console.log('>>> Call API GET list admin!');
+    // console.log('>>> Call API GET list admin!');
 
     const result = await this.adminService.findAll(page, limit, search);
 
@@ -125,5 +123,24 @@ export class AdminController {
     }
 
     return new ResponseDto('success', 'Reset mật khẩu thành công!', admin);
+  }
+
+  @Patch('/status/:id')
+  async updateStatus(@Param('id') id: number): Promise<ResponseDto<any>> {
+    try {
+      const updatedAdmin = await this.adminService.updateStatus(id);
+
+      if (!updatedAdmin) {
+        return new ResponseDto('error', 'Không tìm thấy QTV!', null);
+      }
+
+      return new ResponseDto(
+        'success',
+        'Cập nhật trạng thái QTV thành công!',
+        updatedAdmin,
+      );
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi cập nhật trạng thái!', null);
+    }
   }
 }

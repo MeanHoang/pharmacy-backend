@@ -19,8 +19,8 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('store')
-// @UseGuards(JwtAuthGuard, RolesGuard)
-// @Roles('store', 'admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('store', 'admin')
 export class StoreController {
   constructor(private readonly storeService: StoreService) {}
 
@@ -118,12 +118,35 @@ export class StoreController {
 
   @Patch('/reset-password/:id')
   async resetPassword(@Param('id') id: number): Promise<ResponseDto<any>> {
-    const store = await this.storeService.resetPassword(id);
+    try {
+      const store = await this.storeService.resetPassword(id);
 
-    if (store === null) {
-      return new ResponseDto('error', 'Store không tồn tại!', null);
+      if (store === null) {
+        return new ResponseDto('error', 'Store không tồn tại!', null);
+      }
+
+      return new ResponseDto('success', 'Reset mật khẩu thành công!', store);
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi đặt lại mật khẩu!', null);
     }
+  }
 
-    return new ResponseDto('success', 'Reset mật khẩu thành công!', store);
+  @Patch('/status/:id')
+  async updateStatus(@Param('id') id: number): Promise<ResponseDto<any>> {
+    try {
+      const updatedStore = await this.storeService.updateStatus(id);
+
+      if (!updatedStore) {
+        return new ResponseDto('error', 'Không tìm thấy cửa hàng!', null);
+      }
+
+      return new ResponseDto(
+        'success',
+        'Cập nhật trạng thái cửa hàng thành công!',
+        updatedStore,
+      );
+    } catch (error) {
+      return new ResponseDto('error', 'Lỗi cập nhật trạng thái!', null);
+    }
   }
 }

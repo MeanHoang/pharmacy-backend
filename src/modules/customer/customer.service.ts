@@ -88,8 +88,10 @@ export class CustomerService {
 
   //get customer byID
   async getCustomerByID(id: number) {
-    const customer = await this.customerRepositoty.findOneBy({ id });
-
+    const customer = await this.customerRepositoty.findOne({
+      where: { id },
+      relations: ['orders', 'addresses'],
+    });
     if (!customer) {
       return null;
     }
@@ -132,5 +134,29 @@ export class CustomerService {
     }
 
     return true;
+  }
+
+  //reset password
+  async resetPassword(id: number) {
+    const customer = await this.customerRepositoty.findOneBy({ id });
+
+    if (!customer) {
+      return null;
+    }
+
+    const defaultPassword = process.env.DEFAULT_PASS_CUSTOMER || '1';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+    customer.password = hashedPassword;
+
+    return await this.customerRepositoty.save(customer);
+  }
+
+  async updateStatus(id: number): Promise<Customer | null> {
+    const customer = await this.customerRepositoty.findOne({ where: { id } });
+
+    if (!customer) return null;
+
+    customer.is_active = !customer.is_active; // Đảo ngược trạng thái
+    return await this.customerRepositoty.save(customer);
   }
 }

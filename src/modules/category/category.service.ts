@@ -95,4 +95,15 @@ export class CategoryService {
 
     return true;
   }
+
+  async updateStatus(id: number): Promise<Category | null> {
+    const category = await this.categoryRepository.findOne({ where: { id } });
+
+    if (!category) return null;
+
+    category.is_sales = !category.is_sales;
+    return await this.categoryRepository.save(category);
+  }
+
+  
 }

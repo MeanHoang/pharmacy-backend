@@ -57,6 +57,11 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   note: string;
 
+  @Column({
+    default: process.env.URL_IMAGE_DEFAULT,
+  })
+  image: string;
+
   @Column({ default: true })
   is_sales: boolean;
 

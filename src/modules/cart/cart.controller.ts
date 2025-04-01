@@ -30,6 +30,8 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'store')
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 5,
@@ -78,7 +80,7 @@ export class CartController {
   }
 
   //   // @UseGuards(JwtAuthGuard, RolesGuard)
-  //   // @Roles('admin', 'cart')
+  //   // @Roles('admin', 'store')
   //   @Put(':id')
   //   async update(@Body() cartData: Partial<Cart>, @Param('id') id: number) {
   //     try {
@@ -114,6 +116,8 @@ export class CartController {
     }
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'store', 'customer')
   @Get(':id')
   async getCartByID(@Param('id') id: number) {
     try {

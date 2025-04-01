@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindOptionsWhere, Not } from 'typeorm';
 
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+
 import { Product } from 'src/entities/product.entity';
 import { Category } from 'src/entities/category.entity';
 
@@ -12,6 +14,7 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   //find all
@@ -62,7 +65,10 @@ export class ProductService {
   }
 
   //create
-  async create(productData: Partial<Product> & { category_id: number }) {
+  async create(
+    productData: Partial<Product> & { category_id: number },
+    image?: Express.Multer.File,
+  ) {
     // console.log('>>> Check productData: ', productData);
 
     try {
@@ -74,9 +80,20 @@ export class ProductService {
         return null;
       }
 
+      let imageUrl = process.env.URL_IMAGE_DEFAULT;
+
+      if (image) {
+        try {
+          const uploadResult = await this.cloudinaryService.uploadImage(image);
+          imageUrl = uploadResult.secure_url;
+        } catch (error) {
+          console.error('Lỗi upload ảnh:', error);
+        }
+      }
       const newProduct = this.productRepository.create({
         ...productData,
         category, // Gán entity Category, không phải ID
+        image: imageUrl,
       });
 
       // Lưu product vào cơ sở dữ liệu
@@ -120,5 +137,14 @@ export class ProductService {
     }
 
     return true;
+  }
+
+  async updateStatus(id: number): Promise<Product | null> {
+    const product = await this.productRepository.findOne({ where: { id } });
+
+    if (!product) return null;
+
+    product.is_sales = !product.is_sales;
+    return await this.productRepository.save(product);
   }
 }
