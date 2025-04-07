@@ -34,14 +34,24 @@ export class ProductController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 5,
     @Query('search') search?: string,
-    @Query('isSales') isSales?: boolean, // truyền 0,1 thì lại ok
+    @Query('isSales') isSales?: boolean, //truyền true,fasle ko đc truyền 0,1 thì lại ok
+    @Query('categories') categories?: string,
+    @Query('sortBy')
+    sortBy?: 'newest' | 'price_asc' | 'price_desc' | 'best_selling',
   ): Promise<ResponseDto<any>> {
     console.log('>>> Call api get product list');
+
+    const category_ids = categories
+      ? categories.split(',').map((id) => parseInt(id))
+      : [];
+
     const result = await this.productService.findAll(
       page,
       limit,
       search,
       isSales,
+      category_ids,
+      sortBy,
     );
 
     if (!result)

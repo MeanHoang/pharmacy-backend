@@ -23,6 +23,8 @@ export class ProductService {
     limit: number,
     search?: string,
     isSales?: boolean,
+    categories?: number[],
+    sortBy?: 'newest' | 'price_asc' | 'price_desc' | 'best_selling',
   ) {
     try {
       const queryBuilder = this.productRepository.createQueryBuilder('product');
@@ -42,14 +44,36 @@ export class ProductService {
         queryBuilder.andWhere('product.is_sales = :isSales', { isSales });
       }
 
-      queryBuilder
-        .skip((page - 1) * limit)
-        .take(limit)
-        .orderBy('product.updated_at', 'DESC');
+      // Lọc theo category nếu có
+      if (categories && categories.length > 0) {
+        queryBuilder.andWhere('product.category_id IN (:...categories)', {
+          categories,
+        });
+      }
+
+      // Sắp xếp theo yêu cầu
+      switch (sortBy) {
+        case 'price_asc':
+          queryBuilder.orderBy('product.price', 'ASC');
+          break;
+        case 'price_desc':
+          queryBuilder.orderBy('product.price', 'DESC');
+          break;
+        case 'best_selling':
+          queryBuilder.orderBy('product.sold_quantity', 'DESC');
+          break;
+        case 'newest':
+        default:
+          queryBuilder.orderBy('product.updated_at', 'DESC');
+          break;
+      }
+
+      //phân trang
+      queryBuilder.skip((page - 1) * limit).take(limit);
 
       const [data, total] = await queryBuilder.getManyAndCount();
 
-      console.log('>>> check result:', data); // Debug kết quả
+      // console.log('>>> check result:', data);
 
       return {
         data,
@@ -90,11 +114,14 @@ export class ProductService {
           console.error('Lỗi upload ảnh:', error);
         }
       }
+
       const newProduct = this.productRepository.create({
         ...productData,
         category, // Gán entity Category, không phải ID
         image: imageUrl,
       });
+
+      console.log('chech result newProduct: ', newProduct);
 
       // Lưu product vào cơ sở dữ liệu
       return await this.productRepository.save(newProduct);
@@ -105,8 +132,10 @@ export class ProductService {
 
   //get product byID
   async getProductByID(id: number) {
-    const product = await this.productRepository.findOneBy({ id });
-
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
     if (!product) {
       return null;
     }

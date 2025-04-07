@@ -62,6 +62,9 @@ export class Product {
   })
   image: string;
 
+  @Column({ type: 'int', default: 0 })
+  sold_quantity: number;
+
   @Column({ default: true })
   is_sales: boolean;
 
